@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Previewer</title>
+  <title>Web Browser Emulator</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,85 +12,32 @@
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+      background: #1a1a2e;
       min-height: 100vh;
       color: #333;
-    }
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-      color: white;
-    }
-    header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    header p {
-      font-size: 1.1rem;
-      opacity: 0.95;
-    }
-    .search-box {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-      margin-bottom: 20px;
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
     }
-    .search-box input {
+    .browser-window {
       flex: 1;
-      min-width: 250px;
-      padding: 14px 18px;
-      font-size: 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 10px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .search-box input:focus {
-      border-color: #ff0000;
-    }
-    .search-box button {
-      padding: 14px 28px;
-      font-size: 16px;
-      font-weight: 600;
-      background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.1s, box-shadow 0.2s;
-    }
-    .search-box button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-    }
-    .search-box button:active {
-      transform: translateY(0);
-    }
-    .preview-container {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      margin: 10px;
+      border-radius: 12px;
       overflow: hidden;
-      min-height: 70vh;
-      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      background: #fff;
     }
-    .preview-header {
-      background: #f5f5f5;
-      padding: 12px 20px;
+    .browser-header {
+      background: #2d2d3a;
+      padding: 10px 15px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid #e0e0e0;
+      gap: 10px;
+    }
+    .dots {
+      display: flex;
+      gap: 6px;
     }
     .dot {
       width: 12px;
@@ -100,157 +47,243 @@
     .dot.red { background: #ff5f56; }
     .dot.yellow { background: #ffbd2e; }
     .dot.green { background: #27c93f; }
-    .url-display {
-      flex: 1;
-      background: white;
+    .nav-buttons {
+      display: flex;
+      gap: 4px;
+    }
+    .nav-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #3d3d4a;
+      color: #ccc;
       border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 13px;
-      color: #666;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover {
+      background: #4d4d5a;
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .address-bar {
+      flex: 1;
+      display: flex;
+      background: #1e1e2a;
+      border-radius: 8px;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    }
+    .address-bar input {
+      flex: 1;
+      padding: 8px 14px;
+      border: none;
+      background: transparent;
+      color: #eee;
+      font-size: 14px;
+      outline: none;
+    }
+    .go-btn {
+      padding: 0 16px;
+      background: #4a4a5a;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .go-btn:hover {
+      background: #5a5a6a;
+    }
+    .browser-content {
+      flex: 1;
+      position: relative;
+      background: #f0f0f0;
+      min-height: 500px;
     }
     iframe {
       width: 100%;
-      height: calc(100vh - 280px);
-      min-height: 500px;
+      height: 100%;
       border: none;
-      background: #000;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
     .placeholder {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 500px;
-      color: #888;
+      height: 100%;
+      color: #666;
       text-align: center;
       padding: 40px;
     }
-    .placeholder svg {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 20px;
-      opacity: 0.5;
-      color: #ff0000;
+    .placeholder h2 {
+      margin-bottom: 10px;
+      color: #333;
     }
     .note {
-      margin-top: 20px;
-      background: rgba(255,255,255,0.15);
-      color: white;
-      padding: 15px 20px;
-      border-radius: 10px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .note strong {
-      display: block;
-      margin-bottom: 5px;
+      background: #2d2d3a;
+      color: #aaa;
+      padding: 12px 20px;
+      font-size: 13px;
+      text-align: center;
     }
     @media (max-width: 600px) {
-      header h1 { font-size: 1.8rem; }
-      .search-box { flex-direction: column; }
-      iframe { height: 60vh; }
+      .nav-buttons { display: none; }
+      .browser-window { margin: 5px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>YouTube Previewer</h1>
-      <p>Watch YouTube videos right here without going to the site</p>
-    </header>
-
-    <div class="search-box">
-      <input type="text" id="urlInput" placeholder="Paste a YouTube link or video ID (e.g. https://youtu.be/dQw4w9WgXcQ)" />
-      <button onclick="loadPreview()">Preview Video</button>
-    </div>
-
-    <div class="preview-container" id="previewContainer">
-      <div class="preview-header">
+  <div class="browser-window">
+    <div class="browser-header">
+      <div class="dots">
         <span class="dot red"></span>
         <span class="dot yellow"></span>
         <span class="dot green"></span>
-        <span class="url-display" id="urlDisplay">Enter a YouTube link above</span>
       </div>
-      <div class="placeholder" id="placeholder">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-        </svg>
-        <h2>No video loaded yet</h2>
-        <p>Paste a YouTube link and click Preview Video</p>
+      <div class="nav-buttons">
+        <button class="nav-btn" id="backBtn" onclick="goBack()" title="Back">←</button>
+        <button class="nav-btn" id="forwardBtn" onclick="goForward()" title="Forward">→</button>
+        <button class="nav-btn" onclick="reload()" title="Reload">↻</button>
+        <button class="nav-btn" onclick="goHome()" title="Home">🏠</button>
       </div>
-      <iframe id="previewFrame" style="display:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <div class="address-bar">
+        <input type="text" id="urlInput" placeholder="Enter a website URL (e.g. wikipedia.org)" />
+        <button class="go-btn" onclick="navigate()">Go</button>
+      </div>
     </div>
 
-    <div class="note">
-      <strong>How to use:</strong>
-      Paste any YouTube link (watch page, short link, or embed link). The tool automatically converts it so the video plays inside this window. You don't need to sign in or leave this page.
+    <div class="browser-content" id="content">
+      <div class="placeholder" id="placeholder">
+        <h2>Welcome to the Browser Emulator</h2>
+        <p>Type a website address above and press Go or Enter</p>
+      </div>
+      <iframe id="browserFrame" style="display:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
     </div>
   </div>
 
+  <div class="note">
+    This is a simple browser emulator. Many websites (including YouTube, Google, Facebook, and banking sites) block being loaded inside other pages for security reasons. When a site blocks embedding, the frame will stay blank.
+  </div>
+
   <script>
-    function extractVideoId(input) {
-      input = input.trim();
+    let history = [];
+    let currentIndex = -1;
 
-      // Already an embed URL
-      const embedMatch = input.match(/youtube(?:-nocookie)?\.com\/embed\/([a-zA-Z0-9_-]{11})/);
-      if (embedMatch) return embedMatch[1];
+    function normalizeUrl(url) {
+      url = url.trim();
+      if (!url) return null;
 
-      // Watch URL: youtube.com/watch?v=ID
-      const watchMatch = input.match(/(?:youtube\.com\/watch\?v=|youtube\.com\/watch\?.*&v=)([a-zA-Z0-9_-]{11})/);
-      if (watchMatch) return watchMatch[1];
+      // Special handling for YouTube videos
+      const ytId = extractYouTubeId(url);
+      if (ytId) {
+        return `https://www.youtube-nocookie.com/embed/${ytId}`;
+      }
 
-      // Short URL: youtu.be/ID
-      const shortMatch = input.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
-      if (shortMatch) return shortMatch[1];
+      if (!url.match(/^https?:\/\//i)) {
+        url = 'https://' + url;
+      }
+      return url;
+    }
 
-      // Shorts: youtube.com/shorts/ID
-      const shortsMatch = input.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/);
-      if (shortsMatch) return shortsMatch[1];
-
-      // Just the video ID (11 characters)
+    function extractYouTubeId(input) {
+      const patterns = [
+        /youtube(?:-nocookie)?\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+        /(?:youtube\.com\/watch\?v=|youtube\.com\/watch\?.*&v=)([a-zA-Z0-9_-]{11})/,
+        /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+        /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
+      ];
+      for (const p of patterns) {
+        const m = input.match(p);
+        if (m) return m[1];
+      }
       if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
-
       return null;
     }
 
-    function loadPreview() {
-      const input = document.getElementById('urlInput').value.trim();
-      if (!input) {
-        alert('Please paste a YouTube link or video ID');
+    function navigate() {
+      const input = document.getElementById('urlInput').value;
+      const url = normalizeUrl(input);
+      if (!url) {
+        alert('Please enter a URL');
         return;
       }
 
-      const videoId = extractVideoId(input);
-      if (!videoId) {
-        alert('Could not find a valid YouTube video ID. Please paste a full YouTube link.');
-        return;
+      // Trim future history if we navigated back then go somewhere new
+      if (currentIndex < history.length - 1) {
+        history = history.slice(0, currentIndex + 1);
       }
 
-      // Use nocookie domain for slightly better privacy
-      const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}`;
+      history.push(url);
+      currentIndex = history.length - 1;
+      loadUrl(url);
+      updateNavButtons();
+    }
 
-      const iframe = document.getElementById('previewFrame');
+    function loadUrl(url) {
+      const iframe = document.getElementById('browserFrame');
       const placeholder = document.getElementById('placeholder');
-      const urlDisplay = document.getElementById('urlDisplay');
 
       placeholder.style.display = 'none';
       iframe.style.display = 'block';
-      iframe.src = embedUrl;
-      urlDisplay.textContent = embedUrl;
+      iframe.src = url;
+
+      document.getElementById('urlInput').value = url;
     }
 
-    // Allow pressing Enter
+    function goBack() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        loadUrl(history[currentIndex]);
+        updateNavButtons();
+      }
+    }
+
+    function goForward() {
+      if (currentIndex < history.length - 1) {
+        currentIndex++;
+        loadUrl(history[currentIndex]);
+        updateNavButtons();
+      }
+    }
+
+    function reload() {
+      if (currentIndex >= 0) {
+        loadUrl(history[currentIndex]);
+      }
+    }
+
+    function goHome() {
+      document.getElementById('urlInput').value = '';
+      document.getElementById('browserFrame').style.display = 'none';
+      document.getElementById('placeholder').style.display = 'flex';
+      history = [];
+      currentIndex = -1;
+      updateNavButtons();
+    }
+
+    function updateNavButtons() {
+      document.getElementById('backBtn').disabled = currentIndex <= 0;
+      document.getElementById('forwardBtn').disabled = currentIndex >= history.length - 1;
+    }
+
+    // Enter key
     document.getElementById('urlInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
-        loadPreview();
+        navigate();
       }
     });
 
-    // Focus input on load
+    // Focus on load
     document.getElementById('urlInput').focus();
+    updateNavButtons();
   </script>
 </body>
 </html>
